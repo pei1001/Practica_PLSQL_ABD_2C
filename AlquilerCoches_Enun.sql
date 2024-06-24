@@ -132,16 +132,10 @@ exec inicializa_test;
 create or replace procedure test_alquila_coches is
 begin
 
-  --caso 1 Todo correcto  
-  declare
-    arg_NIF varchar(9) := '12345678A';
-    arg_matricula varchar(8) := '1234-ABC';
-    arg_fecha_ini date := to_date('2024-06-01', 'yyyy-mm-dd');
-    arg_fecha_fin date := to_date('2024-06-10', 'yyyy-mm-dd');                                                                 
+  --caso 1 Todo correcto                                                              
   begin
-    inicializa_test; 
-    alquilar_coche(arg_NIF, arg_matricula, arg_fecha_ini, arg_fecha_fin);
-    commit;
+    inicializa_test;
+    alquilar_coche('12345678A', '1234-ABC', to_date('2024-06-01', 'yyyy-mm-dd'), to_date('2024-06-10', 'yyyy-mm-dd'));
     dbms_output.put_line('Caso 1: Alquiler realizado correctamente');
   exception
     when others then
@@ -151,40 +145,69 @@ begin
   --caso 2 nro dias negativo
   begin
     inicializa_test;
-    -- Implementa aquí tu test
+    alquilar_coche('12345678A', '1234-ABC', to_date('2024-06-01', 'yyyy-mm-dd'), to_date('2024-06-01', 'yyyy-mm-dd'));
+    dbms_output.put_line('Caso 2: Se esperaba un error por días inferiores a 1 día');
+  exception
+    when ex_duracion_invalida then
+      dbms_output.put_line('Caso 2: ' || sqlerrm);
+    when others then
+      dbms_output.put_line('Caso 2: Falló - ' || sqlerrm);
   end;
   
   --caso 3 vehiculo inexistente
   begin
     inicializa_test;
-    -- Implementa aquí tu test
+    alquilar_coche('12345678A', '9876-XYZ', to_date('2024-06-01', 'yyyy-mm-dd'), to_date('2024-06-10', 'yyyy-mm-dd'));
+    dbms_output.put_line('Caso 3: Se esperaba un error por vehículo inexistente');
+  exception
+    when ex_vehiculo_inexistente then
+      dbms_output.put_line('Caso 3: ' || sqlerrm);
+    when others then
+      dbms_output.put_line('Caso 3: Falló - ' || sqlerrm);
   end;
-
   --caso 4 Intentar alquilar un coche ya alquilado
   
   --4.1 la fecha ini del alquiler esta dentro de una reserva
   begin
-    inicializa_test;    
-	-- Implementa aquí tu test
-  end; 
+    alquilar_coche('12345678A', '1234-ABC', to_date('2024-06-02', 'yyyy-mm-dd'), to_date('2024-06-10', 'yyyy-mm-dd'));
+    dbms_output.put_line('Caso 4.1: Se esperaba un error por fecha de inicio dentro de una reserva');
+  exception
+    when others then
+      dbms_output.put_line('Caso 4.1: Falló - ' || sqlerrm);
+  end;
   
    --4.2 la fecha fin del alquiler esta dentro de una reserva
   begin
-    inicializa_test;    
-	-- Implementa aquí tu test
-  end; 
+    alquilar_coche('12345678A', '1234-ABC', to_date('2024-05-25', 'yyyy-mm-dd'), to_date('2024-06-05', 'yyyy-mm-dd'));
+    commit;
+    dbms_output.put_line('Caso 4.2: Se esperaba un error por fecha de fin dentro de una reserva');
+exception
+   hen others then
+    dbms_output.put_line('Caso 4.2: Falló - ' || sqlerrm);
+  end;
   
   --4.3 el intervalo del alquiler esta dentro de una reserva
   begin
-    inicializa_test;    
-	-- Implementa aquí tu test
-  end; 
+    alquilar_coche('12345678A', '1234-ABC', to_date('2024-06-02', 'yyyy-mm-dd'), to_date('2024-06-08', 'yyyy-mm-dd'));
+    commit;
+    dbms_output.put_line('Caso 4.3: Se esperaba un error por intervalo del alquiler dentro de una reserva');
+  exception
+    when others then
+      dbms_output.put_line('Caso 4.3: Falló - ' || sqlerrm);
+  end;
     --caso 5 cliente inexistente
   begin
     inicializa_test;
-   -- Implementa aquí tu test
+    alquilar_coche('99999999Z', '1234-ABC', to_date('2024-06-01', 'yyyy-mm-dd'), to_date('2024-06-10', 'yyyy-mm-dd'));
+    dbms_output.put_line('Caso 5: Se esperaba un error por cliente inexistente');
+  exception
+    when ex_cliente_inexistente then
+      dbms_output.put_line('Caso 5: ' || sqlerrm);
+    when others then
+      dbms_output.put_line('Caso 5: Falló - ' || sqlerrm);
   end;
 
+end;
  
 end;
 /
