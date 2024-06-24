@@ -1,3 +1,9 @@
+/*
+   Trabajo degunda convocatoria PLSQL
+   Autor: Pablo Echavarría Íñiguez
+   Link repositorio github: https://github.com/pei1001/Practica_PLSQL_ABD_2C
+*/
+
 drop table modelos            cascade constraints;
 drop table vehiculos        cascade constraints;
 drop table clientes         cascade constraints;
@@ -126,12 +132,20 @@ exec inicializa_test;
 create or replace procedure test_alquila_coches is
 begin
 
-   --caso 1 Todo correcto
+  --caso 1 Todo correcto  
   declare
-                                                                          
+    arg_NIF varchar(9) := '12345678A';
+    arg_matricula varchar(8) := '1234-ABC';
+    arg_fecha_ini date := to_date('2024-06-01', 'yyyy-mm-dd');
+    arg_fecha_fin date := to_date('2024-06-10', 'yyyy-mm-dd');                                                                 
   begin
     inicializa_test; 
-    -- Implementa aquí tu test
+    alquilar_coche(arg_NIF, arg_matricula, arg_fecha_ini, arg_fecha_fin);
+    commit;
+    dbms_output.put_line('Caso 1: Alquiler realizado correctamente');
+  exception
+    when others then
+      dbms_output.put_line('Caso 1: Falló - ' || sqlerrm);
   end;
 	 
   --caso 2 nro dias negativo
