@@ -33,7 +33,7 @@ create table modelos(
 
 
 create table vehiculos(
-  matricula varchar(8)  primary key,
+  matricula varchar(8)  primary key,    
   id_modelo integer  not null references modelos,
   color   varchar(10)
 );
@@ -130,6 +130,18 @@ end;
 exec inicializa_test;
 
 create or replace procedure test_alquila_coches is
+  -- Definición de excepciones personalizadas
+  ex_duracion_invalida EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_duracion_invalida, -20001);
+  
+  ex_vehiculo_inexistente EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_vehiculo_inexistente, -20002);
+
+  ex_vehiculo_no_disponible EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_vehiculo_no_disponible, -20003);
+
+  ex_cliente_inexistente EXCEPTION;
+  PRAGMA EXCEPTION_INIT(ex_cliente_inexistente, -20004);
 begin
 
   --caso 1 Todo correcto                                                              
@@ -182,7 +194,7 @@ begin
     commit;
     dbms_output.put_line('Caso 4.2: Se esperaba un error por fecha de fin dentro de una reserva');
 exception
-   hen others then
+   when others then
     dbms_output.put_line('Caso 4.2: Falló - ' || sqlerrm);
   end;
   
@@ -206,8 +218,6 @@ exception
     when others then
       dbms_output.put_line('Caso 5: Falló - ' || sqlerrm);
   end;
-
-end;
  
 end;
 /
